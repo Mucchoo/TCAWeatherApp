@@ -1,5 +1,5 @@
 //
-//  WeatheryManager.swift
+//  WeatherManager.swift
 //  TCAWeatherApp
 //
 //  Created by Musa Yazici on 2/13/25.
@@ -10,10 +10,10 @@ import CoreLocation
 import Combine
 import SwiftUI
 
-class WeatheryManager {
+class WeatherManager {
     func getCurrentWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) async throws -> ResponseData {
         guard let url = URL(string: "https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=\(latitude)&lon=\(longitude)&appid=14379450f55fe65f99b0236875893d09&units=metric") else {
-            throw NSError(domain: "WeatheryManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Missing URL"])
+            throw NSError(domain: "WeatherManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Missing URL"])
         }
 
         let urlRequest = URLRequest(url: url)
@@ -23,7 +23,7 @@ class WeatheryManager {
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
             print("Received HTTP Status Code: \(statusCode)")
-            throw NSError(domain: "WeatheryManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error fetching weather data"])
+            throw NSError(domain: "WeatherManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error fetching weather data"])
         }
 
         do {

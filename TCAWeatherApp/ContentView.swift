@@ -12,7 +12,7 @@ import WeatherKit
 
 struct ContentView: View {
     @StateObject var viewModel: WeatherViewModel
-    var weatherManager = WeatheryManager()
+    var weatherManager = WeatherManager()
     @State var weather: ResponseData?
     
     var body: some View {
