@@ -140,7 +140,7 @@ class WeatherViewModel: ObservableObject {
     }
     
     var pop: String {
-        return "\(Self.numberFormatter2.string(for: weather.list[0].pop.roundDouble()) ?? "0%")"
+        return "\(Self.numberFormatter2.string(for: String(format: "%.0f", weather.list[0].pop)) ?? "0%")"
     }
     
     var main: String {
@@ -152,7 +152,7 @@ class WeatherViewModel: ObservableObject {
     }
     
     var humidity: String {
-        return "\(weather.list[0].main.humidity.roundDouble())%"
+        return "\(String(format: "%.0f", weather.list[0].main.humidity))%"
     }
     
     var wind: String {

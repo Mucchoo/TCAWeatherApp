@@ -10,7 +10,6 @@
 		260A07E42AA48F08001C5749 /* TCAWeatherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260A07E32AA48F08001C5749 /* TCAWeatherApp.swift */; };
 		260A07E62AA48F08001C5749 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260A07E52AA48F08001C5749 /* ContentView.swift */; };
 		260A07E82AA48F09001C5749 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260A07E72AA48F09001C5749 /* Assets.xcassets */; };
-		260A08022AA4C445001C5749 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260A08012AA4C445001C5749 /* Extensions.swift */; };
 		269D66D62AAE33EF007B8A36 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D66D52AAE33EF007B8A36 /* WeatherManager.swift */; };
 		269D66D82AAE39DE007B8A36 /* WeatherDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D66D72AAE39DE007B8A36 /* WeatherDataModel.swift */; };
 		5B01123B2AD3566300A25696 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B01123A2AD3566300A25696 /* APIService.swift */; };
@@ -24,7 +23,6 @@
 		260A07E32AA48F08001C5749 /* TCAWeatherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAWeatherApp.swift; sourceTree = "<group>"; };
 		260A07E52AA48F08001C5749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		260A07E72AA48F09001C5749 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		260A08012AA4C445001C5749 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		269D66D52AAE33EF007B8A36 /* WeatherManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherManager.swift; sourceTree = "<group>"; };
 		269D66D72AAE39DE007B8A36 /* WeatherDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDataModel.swift; sourceTree = "<group>"; };
 		5B01123A2AD3566300A25696 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
@@ -73,7 +71,6 @@
 				260A07E52AA48F08001C5749 /* ContentView.swift */,
 				269D66D52AAE33EF007B8A36 /* WeatherManager.swift */,
 				5B01123A2AD3566300A25696 /* APIService.swift */,
-				260A08012AA4C445001C5749 /* Extensions.swift */,
 				5B4F5B9D2AE52F06008D226F /* ResponseData.json */,
 				260A07E72AA48F09001C5749 /* Assets.xcassets */,
 			);
@@ -153,7 +150,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				260A08022AA4C445001C5749 /* Extensions.swift in Sources */,
 				260A07E62AA48F08001C5749 /* ContentView.swift in Sources */,
 				269D66D62AAE33EF007B8A36 /* WeatherManager.swift in Sources */,
 				260A07E42AA48F08001C5749 /* TCAWeatherApp.swift in Sources */,

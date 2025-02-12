@@ -75,14 +75,14 @@ struct ContentView: View {
                         viewModel.weatherIcon(for: weatherList.weather[0].main)
                             .renderingMode(.original)
                             .shadow(radius: 3)
-                        Text("\(viewModel.convert(weatherList.main.temp).roundDouble())°")
+                        Text("\(String(format: "%.0f", viewModel.convert(weatherList.main.temp)))°")
                             .bold()
                         HStack(spacing: 5) {
                             Image(systemName: "drop.fill")
                                 .renderingMode(.original)
                                 .foregroundColor(Color("Blue"))
                             
-                            Text((weatherList.main.humidity.roundDouble()) + "%")
+                            Text((String(format: "%.0f", weatherList.main.humidity)) + "%")
                         }
                         .font(.caption)
                     }
@@ -140,8 +140,8 @@ struct ContentView: View {
                     Spacer()
                     HStack {
                         Spacer()
-                        Text("\(viewModel.convert(dailyForecast.maxTemp).roundDouble())°")
-                        Text("\(viewModel.convert(dailyForecast.minTemp).roundDouble())°")
+                        Text("\(String(format: "%.0f", viewModel.convert(dailyForecast.maxTemp)))°")
+                        Text("\(String(format: "%.0f", viewModel.convert(dailyForecast.minTemp)))°")
                         Spacer()
                     }
                     .bold()
