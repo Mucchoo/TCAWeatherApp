@@ -12,7 +12,7 @@ import UIKit
 struct TCAWeatherApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: WeatherViewModel(weather: previewData))
+            ContentView(viewModel: .init())
         }
     }
 }

@@ -19,7 +19,7 @@ class WeatherViewModel: ObservableObject {
     
     var appError: AppError? = nil
     
-    @Published var weather: ResponseData
+    @Published var weather: ResponseData?
     @Published var isLoading: Bool = false
     @AppStorage("location") var storageLocation: String = ""
     @Published var location = ""
@@ -29,11 +29,8 @@ class WeatherViewModel: ObservableObject {
         }
     }
     
-    init(weather: ResponseData) {
-        self.weather = weather
-        if location != "" {
-            getWeatherForecast()
-        }
+    init() {
+        getWeatherForecast()
     }
     
     
@@ -43,7 +40,7 @@ class WeatherViewModel: ObservableObject {
         return formatter
     }()
     
-   func formattedTime(from string: String,  timeZoneOffset: Double) -> String? {
+    func formattedTime(from string: String,  timeZoneOffset: Double) -> String? {
         let inputFormatter = DateFormatter()
         inputFormatter.dateFormat = "YY/MM/dd"
         
@@ -110,55 +107,18 @@ class WeatherViewModel: ObservableObject {
         }
     }
     
-    
-    var name: String {
-        return weather.city.name
-    }
-    
-    var day: String {
-        return weeklyDay.string(from: Date(timeIntervalSince1970: weather.list[0].dt))
-    }
-    
-    var overview: String {
-        return weather.list[0].weather[0].description.capitalized
-    }
-    
-    var temperature: String {
-        return "\(Self.numberFormatter.string(for: convert(weather.list[0].main.temp)) ?? "0")°"
-    }
-    
-    var high: String {
-        return "H: \(Self.numberFormatter.string(for: convert(weather.list[0].main.tempMax)) ?? "0")°"
-    }
-    
-    var low: String {
-        return "L: \(Self.numberFormatter.string(for: convert(weather.list[0].main.tempMin)) ?? "0")°"
-    }
-    
-    var feels: String {
-        return "\(Self.numberFormatter.string(for: convert(weather.list[0].main.feelsLike)) ?? "0")°"
-    }
-    
-    var pop: String {
-        return "\(Self.numberFormatter2.string(for: String(format: "%.0f", weather.list[0].pop)) ?? "0%")"
-    }
-    
-    var main: String {
-        return "\(weather[0].weather[0].main)"
-    }
-    
-    var clouds: String {
-        return "\(weather.list[0].clouds)%"
-    }
-    
-    var humidity: String {
-        return "\(String(format: "%.0f", weather.list[0].main.humidity))%"
-    }
-    
-    var wind: String {
-        return "\(Self.numberFormatter.string(for: weather.list[0].wind.speed) ?? "0")m/s"
-    }
-    
+    var name: String { weather.city.name }
+    var day: String { weeklyDay.string(from: Date(timeIntervalSince1970: weather.list[0].dt)) }
+    var overview: String { weather.list[0].weather[0].description.capitalized }
+    var temperature: String { "\(Self.numberFormatter.string(for: convert(weather.list[0].main.temp)) ?? "0")°" }
+    var high: String { "H: \(Self.numberFormatter.string(for: convert(weather.list[0].main.tempMax)) ?? "0")°" }
+    var low: String { "L: \(Self.numberFormatter.string(for: convert(weather.list[0].main.tempMin)) ?? "0")°" }
+    var feels: String { "\(Self.numberFormatter.string(for: convert(weather.list[0].main.feelsLike)) ?? "0")°" }
+    var pop: String { "\(Self.numberFormatter2.string(for: String(format: "%.0f", weather.list[0].pop)) ?? "0%")" }
+    var main: String { "\(weather[0].weather[0].main)" }
+    var clouds: String { "\(weather.list[0].clouds)%" }
+    var humidity: String { "\(String(format: "%.0f", weather.list[0].main.humidity))%" }
+    var wind: String { "\(Self.numberFormatter.string(for: weather.list[0].wind.speed) ?? "0")m/s" }
     
     public struct DailyForecast {
         let day: String
@@ -184,7 +144,7 @@ class WeatherViewModel: ObservableObject {
         }
     }
     
- func getWeatherForecast() {
+    func getWeatherForecast() {
         storageLocation = location
         isLoading = true
         let apiService = APIService.shared

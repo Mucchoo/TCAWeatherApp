@@ -12,15 +12,13 @@ import WeatherKit
 
 struct ContentView: View {
     @StateObject var viewModel: WeatherViewModel
-    var weatherManager = WeatherManager()
-    @State var weather: ResponseData?
     
     var body: some View {
         ZStack {
             Color.gray.opacity(0.1)
                 .edgesIgnoringSafeArea(.all)
             
-            if let weather {
+            if let weather = viewModel.weather {
                 ScrollView(showsIndicators: false) {
                     scrollViewContent(weather: weather)
                     .padding()
@@ -38,12 +36,12 @@ struct ContentView: View {
         VStack(spacing: 15) {
             HStack {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(formatedTime(time: Date.now, timeZoneOffset: viewModel.weather.city.timezone))
+                    Text(formatedTime(time: Date.now, timeZoneOffset: weather.city.timezone))
                         .font(.caption2)
                         .bold()
                     Text(viewModel.temperature)
                         .font(.system(size: 40))
-                    Text(viewModel.weather.city.name)
+                    Text(weather.city.name)
                         .font(.body)
                         .bold()
                 }
@@ -59,16 +57,16 @@ struct ContentView: View {
             .background(.ultraThinMaterial)
             .cornerRadius(20)
             
-            hourlyForecastsView(weather: weather)
-            sunriseView
-            dailyForecastsView
+            hourlyForecastsView(weather)
+            sunriseView(weather)
+            dailyForecastsView(weather)
         }
     }
     
-    private func hourlyForecastsView(weather: ResponseData) -> some View {
+    private func hourlyForecastsView(_ weather: ResponseData) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                ForEach(viewModel.weather.list, id: \.self) { weatherList in
+                ForEach(weather.list, id: \.self) { weatherList in
                     VStack(spacing: 10) {
                         Text(viewModel.formattedHourlyTime(time: weatherList.dt, timeZoneOffset: weather.city.timezone))
                             .font(.caption2)
@@ -97,19 +95,19 @@ struct ContentView: View {
         }
     }
     
-    private var sunriseView: some View {
+    private func sunriseView(_ weather: ResponseData) -> some View {
         HStack {
             Text("Sunrise")
                 .bold()
             Image(systemName: "sun.max.fill")
                 .renderingMode(.original)
-            Text(formatTime(unixTime: viewModel.weather.city.sunrise, timeZoneOffset: viewModel.weather.city.timezone))
+            Text(formatTime(unixTime: weather.city.sunrise, timeZoneOffset: weather.city.timezone))
             Spacer()
             Text("Sunset")
                 .bold()
             Image(systemName: "moon.fill")
                 .foregroundColor(Color("DarkBlue"))
-            Text(formatTime(unixTime: viewModel.weather.city.sunset, timeZoneOffset: viewModel.weather.city.timezone))
+            Text(formatTime(unixTime: weather.city.sunset, timeZoneOffset: weather.city.timezone))
         }
         .font(.body)
         .padding()
@@ -119,14 +117,14 @@ struct ContentView: View {
         .cornerRadius(20)
     }
     
-    private var dailyForecastsView: some View {
+    private func dailyForecastsView(_ weather: ResponseData) -> some View {
         let sortedDailyForecasts = viewModel.dailyForecasts.sorted { $0.day < $1.day }
         
         return VStack(alignment: .leading) {
             ForEach(sortedDailyForecasts, id: \.day) { dailyForecast in
                 HStack {
                     HStack {
-                        Text(viewModel.formattedTime(from: dailyForecast.day, timeZoneOffset: viewModel.weather.city.timezone) ?? viewModel.day)
+                        Text(viewModel.formattedTime(from: dailyForecast.day, timeZoneOffset: weather.city.timezone) ?? viewModel.day)
                         Spacer()
                     }
                     Spacer()
@@ -174,5 +172,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(viewModel: WeatherViewModel(weather: previewData))
+    ContentView(viewModel: WeatherViewModel())
 }
