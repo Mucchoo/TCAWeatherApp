@@ -12,26 +12,28 @@ import Combine
 import SwiftUI
 
 class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published var location: CLLocationCoordinate2D?
+    private let locationManager = CLLocationManager()
+    private var currentLocation: String = "San Francisco"
     @Published var isLoading = false
     @Published var weatherState: State?
-    @AppStorage("location") var storageLocation: String = ""
-    let locationManager = CLLocationManager()
     
     struct State {
-        var name: String
-        var day: String
-        var overview: String
-        var temperature: String
-        var high: String
-        var low: String
-        var feels: String
-        var pop: String
-        var main: String
-        var clouds: String
-        var humidity: String
-        var wind: String
-        var dailyForecasts: [DailyForecast]
+        let name: String
+        let day: String
+        let overview: String
+        let temperature: String
+        let high: String
+        let low: String
+        let feels: String
+        let pop: String
+        let main: String
+        let clouds: String
+        let humidity: String
+        let wind: String
+        let timezone: Double
+        let sunrise: Double
+        let sunset: Double
+        let dailyForecasts: [DailyForecast]
         
         struct DailyForecast {
             let day: String
@@ -60,7 +62,10 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             self.clouds = "\(weather.list[0].clouds)%"
             self.humidity = "\(String(format: "%.0f", weather.list[0].main.humidity))%"
             self.wind = "\(numberFormatter.string(for: weather.list[0].wind.speed) ?? "0")m/s"
-            
+            self.timezone = weather.city.timezone
+            self.sunset = weather.city.sunset
+            self.sunrise = weather.city.sunrise
+
             let groupedData = Dictionary(grouping: weather.list) { (element) -> Substring in
                 return element.localTime.prefix(10)
             }
@@ -95,7 +100,6 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.first?.coordinate else { return }
-        self.location = location
         isLoading = false
     }
     
@@ -160,9 +164,7 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func getWeatherForecast() {
-        storageLocation = location
-        isLoading = true
-        CLGeocoder().geocodeAddressString(location) { (placemarks, error) in
+        CLGeocoder().geocodeAddressString(currentLocation) { (placemarks, error) in
             if let error = error as? CLError {
                 switch error.code {
                 case .locationUnknown, .geocodeFoundNoResult, .geocodeFoundPartialResult:
@@ -198,7 +200,5 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
 }
 
 extension Double {
-    func tempToCelsius() -> Double {
-        let celsius = self - 273.5
-    }
+    func tempToCelsius() -> Double { self - 273.5 }
 }

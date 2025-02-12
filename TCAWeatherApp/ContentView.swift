@@ -49,21 +49,21 @@ struct ContentView: View {
         .background(Color(.systemBackground).opacity(0.8))
     }
     
-    private func scrollViewContent(weather: ResponseData) -> some View {
+    private func scrollViewContent(weather: WeatherViewModel.State) -> some View {
         VStack(spacing: 15) {
             HStack {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(formatedTime(time: Date.now, timeZoneOffset: weather.city.timezone))
+                    Text(formatedTime(time: Date.now, timeZoneOffset: weather.timezone))
                         .font(.caption2)
                         .bold()
-                    Text(viewModel.temperature)
+                    Text(weather.temperature)
                         .font(.system(size: 40))
-                    Text(weather.city.name)
+                    Text(weather.name)
                         .font(.body)
                         .bold()
                 }
                 Spacer()
-                viewModel.weatherIcon(for: viewModel.main)
+                viewModel.weatherIcon(for: weather.main)
                     .renderingMode(.original)
                     .font(.system(size: 50))
                     .shadow(radius: 5)
@@ -74,57 +74,24 @@ struct ContentView: View {
             .background(.ultraThinMaterial)
             .cornerRadius(20)
             
-            hourlyForecastsView(weather)
             sunriseView(weather)
             dailyForecastsView(weather)
         }
     }
     
-    private func hourlyForecastsView(_ weather: ResponseData) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                ForEach(weather.list, id: \.self) { weatherList in
-                    VStack(spacing: 10) {
-                        Text(viewModel.formattedHourlyTime(time: weatherList.dt, timeZoneOffset: weather.city.timezone))
-                            .font(.caption2)
-                        viewModel.weatherIcon(for: weatherList.weather[0].main)
-                            .renderingMode(.original)
-                            .shadow(radius: 3)
-                        Text("\(String(format: "%.0f", viewModel.convert(weatherList.main.temp)))°")
-                            .bold()
-                        HStack(spacing: 5) {
-                            Image(systemName: "drop.fill")
-                                .renderingMode(.original)
-                                .foregroundColor(Color("Blue"))
-                            
-                            Text((String(format: "%.0f", weatherList.main.humidity)) + "%")
-                        }
-                        .font(.caption)
-                    }
-                    .frame(minWidth: 10, minHeight: 80)
-                    .padding()
-                    .background(Color.white)
-                    .foregroundColor(.primary)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(20)
-                }
-            }
-        }
-    }
-    
-    private func sunriseView(_ weather: ResponseData) -> some View {
+    private func sunriseView(_ weather: WeatherViewModel.State) -> some View {
         HStack {
             Text("Sunrise")
                 .bold()
             Image(systemName: "sun.max.fill")
                 .renderingMode(.original)
-            Text(formatTime(unixTime: weather.city.sunrise, timeZoneOffset: weather.city.timezone))
+            Text(formatTime(unixTime: weather.sunrise, timeZoneOffset: weather.timezone))
             Spacer()
             Text("Sunset")
                 .bold()
             Image(systemName: "moon.fill")
                 .foregroundColor(Color("DarkBlue"))
-            Text(formatTime(unixTime: weather.city.sunset, timeZoneOffset: weather.city.timezone))
+            Text(formatTime(unixTime: weather.sunset, timeZoneOffset: weather.timezone))
         }
         .font(.body)
         .padding()
@@ -134,14 +101,14 @@ struct ContentView: View {
         .cornerRadius(20)
     }
     
-    private func dailyForecastsView(_ weather: ResponseData) -> some View {
-        let sortedDailyForecasts = viewModel.dailyForecasts.sorted { $0.day < $1.day }
+    private func dailyForecastsView(_ weather: WeatherViewModel.State) -> some View {
+        let sortedDailyForecasts = weather.dailyForecasts.sorted { $0.day < $1.day }
         
         return VStack(alignment: .leading) {
             ForEach(sortedDailyForecasts, id: \.day) { dailyForecast in
                 HStack {
                     HStack {
-                        Text(viewModel.formattedTime(from: dailyForecast.day, timeZoneOffset: weather.city.timezone) ?? viewModel.day)
+                        Text(viewModel.formattedTime(from: dailyForecast.day, timeZoneOffset: weather.timezone) ?? "")
                         Spacer()
                     }
                     Spacer()
@@ -155,8 +122,8 @@ struct ContentView: View {
                     Spacer()
                     HStack {
                         Spacer()
-                        Text("\(String(format: "%.0f", viewModel.convert(dailyForecast.maxTemp)))°")
-                        Text("\(String(format: "%.0f", viewModel.convert(dailyForecast.minTemp)))°")
+                        Text("\(String(format: "%.0f", dailyForecast.maxTemp.tempToCelsius()))°")
+                        Text("\(String(format: "%.0f", dailyForecast.minTemp.tempToCelsius()))°")
                         Spacer()
                     }
                     .bold()
