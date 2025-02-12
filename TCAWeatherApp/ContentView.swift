@@ -18,7 +18,7 @@ struct ContentView: View {
             Color.gray.opacity(0.1)
                 .edgesIgnoringSafeArea(.all)
             
-            if let weather = viewModel.weather {
+            if let weather = viewModel.weatherState {
                 ScrollView(showsIndicators: false) {
                     scrollViewContent(weather: weather)
                     .padding()
@@ -27,6 +27,23 @@ struct ContentView: View {
                         viewModel.getWeatherForecast()
                     }
                 }
+            } else {
+                VStack {
+                    Text("Please share your current location to get the weather in your area")
+                    .bold()
+                    .font(.title)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    
+                    LocationButton(.shareCurrentLocation) {
+                        viewModel.requestLocation()
+                    }
+                    .cornerRadius(30)
+                    .symbolVariant(.fill)
+                    .foregroundColor(.white)
+                    .background(Color(.systemBackground))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .background(Color(.systemBackground).opacity(0.8))

@@ -11,34 +11,107 @@ import CoreLocationUI
 import Combine
 import SwiftUI
 
-class WeatherViewModel: ObservableObject {
-    struct AppError: Identifiable {
-        let id = UUID().uuidString
-        let errorString: String
-    }
-    
-    var appError: AppError? = nil
-    
-    @Published var weather: ResponseData?
-    @Published var isLoading: Bool = false
+class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
+    @Published var location: CLLocationCoordinate2D?
+    @Published var isLoading = false
+    @Published var weatherState: State?
     @AppStorage("location") var storageLocation: String = ""
-    @Published var location = ""
-    @AppStorage("system") var system: Int = 0 {
-        didSet {
-            getWeatherForecast()
+    let locationManager = CLLocationManager()
+    
+    struct State {
+        var name: String
+        var day: String
+        var overview: String
+        var temperature: String
+        var high: String
+        var low: String
+        var feels: String
+        var pop: String
+        var main: String
+        var clouds: String
+        var humidity: String
+        var wind: String
+        var dailyForecasts: [DailyForecast]
+        
+        struct DailyForecast {
+            let day: String
+            let maxTemp: Double
+            let minTemp: Double
+            let main: String
+        }
+        
+        init(from weather: ResponseData) {
+            let numberFormatter = NumberFormatter()
+            numberFormatter.maximumFractionDigits = 0
+            let numberFormatter2 = NumberFormatter()
+            numberFormatter.numberStyle = .percent
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "d/M E"
+            
+            self.name = weather.city.name
+            self.day = dateFormatter.string(from: Date(timeIntervalSince1970: weather.list[0].dt))
+            self.overview = weather.list[0].weather[0].description.capitalized
+            self.temperature = "\(numberFormatter.string(for: weather.list[0].main.temp.tempToCelsius()) ?? "0")°"
+            self.high = "H: \(numberFormatter.string(for: weather.list[0].main.tempMax.tempToCelsius()) ?? "0")°"
+            self.low = "L: \(numberFormatter.string(for: weather.list[0].main.tempMin.tempToCelsius()) ?? "0")°"
+            self.feels = "\(numberFormatter.string(for: weather.list[0].main.feelsLike.tempToCelsius()) ?? "0")°"
+            self.pop = "\(numberFormatter2.string(for: String(format: "%.0f", weather.list[0].pop)) ?? "0%")"
+            self.main = "\(weather[0].weather[0].main)"
+            self.clouds = "\(weather.list[0].clouds)%"
+            self.humidity = "\(String(format: "%.0f", weather.list[0].main.humidity))%"
+            self.wind = "\(numberFormatter.string(for: weather.list[0].wind.speed) ?? "0")m/s"
+            
+            let groupedData = Dictionary(grouping: weather.list) { (element) -> Substring in
+                return element.localTime.prefix(10)
+            }
+            
+            self.dailyForecasts = groupedData.compactMap { (key, values) in
+                guard let maxTemp = values.max(by: { $0.main.tempMax < $1.main.tempMax }),
+                      let minTemp = values.min(by: { $0.main.tempMin < $1.main.tempMin }) else {
+                    return nil
+                }
+                return DailyForecast(day: String(key),
+                                     maxTemp: maxTemp.main.tempMax,
+                                     minTemp: minTemp.main.tempMin,
+                                     main: maxTemp.weather[0].main)
+            }
         }
     }
     
-    init() {
+    override init() {
+        super.init()
+        locationManager.delegate = self
         getWeatherForecast()
     }
     
+    func requestLocation() {
+        isLoading = true
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        locationManager.requestLocation()
+        locationManager.startUpdatingLocation()
+    }
     
-    let weeklyDay: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d/M E"
-        return formatter
-    }()
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.first?.coordinate else { return }
+        self.location = location
+        isLoading = false
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if let clError = error as? CLError {
+            switch clError.code {
+            case .locationUnknown:
+                print("Error, location unknown", error)
+            case .denied:
+                print("Error, Location denied", error)
+            default:
+                print("Error getting location", error)
+                isLoading = false
+            }
+        }
+    }
     
     func formattedTime(from string: String,  timeZoneOffset: Double) -> String? {
         let inputFormatter = DateFormatter()
@@ -47,7 +120,9 @@ class WeatherViewModel: ObservableObject {
         if let date = inputFormatter.date(from: string) {
             let formatter = DateFormatter()
             formatter.timeZone = TimeZone(secondsFromGMT: Int(timeZoneOffset))
-            return weeklyDay.string(from: date)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "d/M E"
+            return dateFormatter.string(from: date)
         }
         return nil
     }
@@ -69,29 +144,6 @@ class WeatherViewModel: ObservableObject {
         return formatter.string(from: date)
     }
     
-    static var numberFormatter: NumberFormatter {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.maximumFractionDigits = 0
-        return numberFormatter
-    }
-    
-    static var numberFormatter2: NumberFormatter {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .percent
-        return numberFormatter
-    }
-    
-    
-    func convert(_ temp: Double) -> Double {
-        let celsius = temp - 273.5
-        if system == 0 {
-            return celsius
-        } else {
-            return celsius * 9 / 5 + 32
-        }
-    }
-    
-    
     func weatherIcon(for condition: String) -> Image {
         switch condition {
         case "Clear":
@@ -107,80 +159,46 @@ class WeatherViewModel: ObservableObject {
         }
     }
     
-    var name: String { weather.city.name }
-    var day: String { weeklyDay.string(from: Date(timeIntervalSince1970: weather.list[0].dt)) }
-    var overview: String { weather.list[0].weather[0].description.capitalized }
-    var temperature: String { "\(Self.numberFormatter.string(for: convert(weather.list[0].main.temp)) ?? "0")°" }
-    var high: String { "H: \(Self.numberFormatter.string(for: convert(weather.list[0].main.tempMax)) ?? "0")°" }
-    var low: String { "L: \(Self.numberFormatter.string(for: convert(weather.list[0].main.tempMin)) ?? "0")°" }
-    var feels: String { "\(Self.numberFormatter.string(for: convert(weather.list[0].main.feelsLike)) ?? "0")°" }
-    var pop: String { "\(Self.numberFormatter2.string(for: String(format: "%.0f", weather.list[0].pop)) ?? "0%")" }
-    var main: String { "\(weather[0].weather[0].main)" }
-    var clouds: String { "\(weather.list[0].clouds)%" }
-    var humidity: String { "\(String(format: "%.0f", weather.list[0].main.humidity))%" }
-    var wind: String { "\(Self.numberFormatter.string(for: weather.list[0].wind.speed) ?? "0")m/s" }
-    
-    public struct DailyForecast {
-        let day: String
-        let maxTemp: Double
-        let minTemp: Double
-        let main: String
-    }
-    
-    public var dailyForecasts: [DailyForecast] {
-        let groupedData = Dictionary(grouping: weather.list) { (element) -> Substring in
-            return element.localTime.prefix(10)
-        }
-        
-        return groupedData.compactMap { (key, values) in
-            guard let maxTemp = values.max(by: { $0.main.tempMax < $1.main.tempMax }),
-                  let minTemp = values.min(by: { $0.main.tempMin < $1.main.tempMin }) else {
-                return nil
-            }
-            return DailyForecast(day: String(key),
-                                 maxTemp: maxTemp.main.tempMax,
-                                 minTemp: minTemp.main.tempMin,
-                                 main: maxTemp.weather[0].main)
-        }
-    }
-    
     func getWeatherForecast() {
         storageLocation = location
         isLoading = true
-        let apiService = APIService.shared
         CLGeocoder().geocodeAddressString(location) { (placemarks, error) in
             if let error = error as? CLError {
                 switch error.code {
                 case .locationUnknown, .geocodeFoundNoResult, .geocodeFoundPartialResult:
-                    self.appError = AppError(errorString: NSLocalizedString("Unable to determine location from this text.", comment: ""))
+                    print("Unable to determine location from this text.")
                 case .network:
-                    self.appError = AppError(errorString: NSLocalizedString("You do not appear to have a network connection", comment: ""))
+                    print("You do not appear to have a network connection")
                 default:
-                    self.appError = AppError(errorString: error.localizedDescription)
+                    print(error.localizedDescription)
                 }
                 self.isLoading = false
-                self.appError = AppError(errorString: error.localizedDescription)
                 print(error.localizedDescription)
             }
             if let latitude = placemarks?.first?.location?.coordinate.latitude,
                let longtitude = placemarks?.first?.location?.coordinate.longitude {
-                apiService.getJSON(urlString: "https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=\(latitude)&lon=\(longtitude)&appid=14379450f55fe65f99b0236875893d09&units=metric", dateDecodingStrategy: .secondsSince1970) { (result: Result<ResponseData,APIService.APIError>) in
+                APIService.shared.getJSON(urlString: "https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=\(latitude)&lon=\(longtitude)&appid=14379450f55fe65f99b0236875893d09&units=metric", dateDecodingStrategy: .secondsSince1970) { (result: Result<ResponseData,APIService.APIError>) in
                     switch result {
                     case .success(let weather):
                         DispatchQueue.main.async {
                             self.isLoading = false
-                            self.weather = weather
+                            self.weatherState = .init(from: weather)
                         }
                     case .failure(let apiError):
                         switch apiError {
                         case .error(let errorString):
                             self.isLoading = false
-                            self.appError = AppError(errorString: errorString)
                             print(errorString)
                         }
                     }
                 }
             }
         }
+    }
+}
+
+extension Double {
+    func tempToCelsius() -> Double {
+        let celsius = self - 273.5
     }
 }
