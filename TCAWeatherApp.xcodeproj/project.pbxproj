@@ -10,13 +10,7 @@
 		260A07E42AA48F08001C5749 /* TCAWeatherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260A07E32AA48F08001C5749 /* TCAWeatherApp.swift */; };
 		260A07E62AA48F08001C5749 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260A07E52AA48F08001C5749 /* ContentView.swift */; };
 		260A07E82AA48F09001C5749 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 260A07E72AA48F09001C5749 /* Assets.xcassets */; };
-		260A07FC2AA4C2D4001C5749 /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260A07FB2AA4C2D4001C5749 /* WeatherView.swift */; };
 		260A08022AA4C445001C5749 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260A08012AA4C445001C5749 /* Extensions.swift */; };
-		262497972AB0B36800EE9CF0 /* DailyForecastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262497962AB0B36800EE9CF0 /* DailyForecastView.swift */; };
-		264BC5432AB126A700866794 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264BC5422AB126A700866794 /* MainView.swift */; };
-		264BC5452AB1FEAD00866794 /* TopWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264BC5442AB1FEAD00866794 /* TopWeatherView.swift */; };
-		264BC5472AB259FE00866794 /* SunriseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 264BC5462AB259FE00866794 /* SunriseView.swift */; };
-		267046632AAB8F2600236851 /* HourlyForecastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267046622AAB8F2600236851 /* HourlyForecastView.swift */; };
 		269D66D62AAE33EF007B8A36 /* WeatherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D66D52AAE33EF007B8A36 /* WeatherManager.swift */; };
 		269D66D82AAE39DE007B8A36 /* WeatherDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269D66D72AAE39DE007B8A36 /* WeatherDataModel.swift */; };
 		5B01123B2AD3566300A25696 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B01123A2AD3566300A25696 /* APIService.swift */; };
@@ -30,13 +24,7 @@
 		260A07E32AA48F08001C5749 /* TCAWeatherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAWeatherApp.swift; sourceTree = "<group>"; };
 		260A07E52AA48F08001C5749 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		260A07E72AA48F09001C5749 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		260A07FB2AA4C2D4001C5749 /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
 		260A08012AA4C445001C5749 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		262497962AB0B36800EE9CF0 /* DailyForecastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyForecastView.swift; sourceTree = "<group>"; };
-		264BC5422AB126A700866794 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		264BC5442AB1FEAD00866794 /* TopWeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopWeatherView.swift; sourceTree = "<group>"; };
-		264BC5462AB259FE00866794 /* SunriseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseView.swift; sourceTree = "<group>"; };
-		267046622AAB8F2600236851 /* HourlyForecastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyForecastView.swift; sourceTree = "<group>"; };
 		269D66D52AAE33EF007B8A36 /* WeatherManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherManager.swift; sourceTree = "<group>"; };
 		269D66D72AAE39DE007B8A36 /* WeatherDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDataModel.swift; sourceTree = "<group>"; };
 		5B01123A2AD3566300A25696 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
@@ -80,54 +68,16 @@
 				5B6C4CC22AD4620A00D12BDA /* TCAWeatherAppRelease.entitlements */,
 				5B3DAFA82AD438F900812244 /* Info.plist */,
 				260A07E32AA48F08001C5749 /* TCAWeatherApp.swift */,
-				2670465F2AAB81EB00236851 /* ViewModels */,
-				260A07F42AA4A248001C5749 /* Views */,
-				260A07F12AA4960B001C5749 /* Managers */,
-				5B4F5B9F2AE589DB008D226F /* Helpers */,
-				260A07E72AA48F09001C5749 /* Assets.xcassets */,
-			);
-			path = TCAWeatherApp;
-			sourceTree = "<group>";
-		};
-		260A07F12AA4960B001C5749 /* Managers */ = {
-			isa = PBXGroup;
-			children = (
-				269D66D52AAE33EF007B8A36 /* WeatherManager.swift */,
-			);
-			path = Managers;
-			sourceTree = "<group>";
-		};
-		260A07F42AA4A248001C5749 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				260A07E52AA48F08001C5749 /* ContentView.swift */,
-				264BC5422AB126A700866794 /* MainView.swift */,
-				260A07FB2AA4C2D4001C5749 /* WeatherView.swift */,
-				264BC5442AB1FEAD00866794 /* TopWeatherView.swift */,
-				267046622AAB8F2600236851 /* HourlyForecastView.swift */,
-				264BC5462AB259FE00866794 /* SunriseView.swift */,
-				262497962AB0B36800EE9CF0 /* DailyForecastView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		2670465F2AAB81EB00236851 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
 				269D66D72AAE39DE007B8A36 /* WeatherDataModel.swift */,
 				5BA388A72AD9EEB300FB3E66 /* WeatherViewModel.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		5B4F5B9F2AE589DB008D226F /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
+				260A07E52AA48F08001C5749 /* ContentView.swift */,
+				269D66D52AAE33EF007B8A36 /* WeatherManager.swift */,
 				5B01123A2AD3566300A25696 /* APIService.swift */,
 				260A08012AA4C445001C5749 /* Extensions.swift */,
 				5B4F5B9D2AE52F06008D226F /* ResponseData.json */,
+				260A07E72AA48F09001C5749 /* Assets.xcassets */,
 			);
-			path = Helpers;
+			path = TCAWeatherApp;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -203,19 +153,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				264BC5432AB126A700866794 /* MainView.swift in Sources */,
-				267046632AAB8F2600236851 /* HourlyForecastView.swift in Sources */,
 				260A08022AA4C445001C5749 /* Extensions.swift in Sources */,
 				260A07E62AA48F08001C5749 /* ContentView.swift in Sources */,
 				269D66D62AAE33EF007B8A36 /* WeatherManager.swift in Sources */,
 				260A07E42AA48F08001C5749 /* TCAWeatherApp.swift in Sources */,
-				264BC5452AB1FEAD00866794 /* TopWeatherView.swift in Sources */,
 				5BA388A82AD9EEB300FB3E66 /* WeatherViewModel.swift in Sources */,
-				262497972AB0B36800EE9CF0 /* DailyForecastView.swift in Sources */,
-				264BC5472AB259FE00866794 /* SunriseView.swift in Sources */,
 				5B01123B2AD3566300A25696 /* APIService.swift in Sources */,
 				269D66D82AAE39DE007B8A36 /* WeatherDataModel.swift in Sources */,
-				260A07FC2AA4C2D4001C5749 /* WeatherView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
