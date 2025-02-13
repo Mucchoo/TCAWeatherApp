@@ -6,13 +6,18 @@
 //
 
 import SwiftUI
-import UIKit
+import ComposableArchitecture
 
 @main
 struct TCAWeatherApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: .init())
+            WeatherView(
+                store: Store(
+                    initialState: WeatherFeature.State(),
+                    reducer: { WeatherFeature() }
+                )
+            )
         }
     }
 }
