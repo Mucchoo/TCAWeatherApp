@@ -23,9 +23,6 @@ struct ContentView: View {
                     scrollViewContent(weather: weather)
                     .padding()
                     .aspectRatio(1.0, contentMode: .fill)
-                    .onAppear {
-                        viewModel.getWeatherForecast()
-                    }
                 }
             } else {
                 VStack {

@@ -11,9 +11,9 @@ import CoreLocationUI
 import Combine
 import SwiftUI
 
-class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
+class WeatherViewModel: NSObject, ObservableObject {
     private let locationManager = CLLocationManager()
-    private var currentLocation: String = "San Francisco"
+    private var currentLocation: CLLocationCoordinate2D?
     @Published var isLoading = false
     @Published var weatherState: State?
     
@@ -75,10 +75,12 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                       let minTemp = values.min(by: { $0.main.tempMin < $1.main.tempMin }) else {
                     return nil
                 }
-                return DailyForecast(day: String(key),
-                                     maxTemp: maxTemp.main.tempMax,
-                                     minTemp: minTemp.main.tempMin,
-                                     main: maxTemp.weather[0].main)
+                return DailyForecast(
+                    day: String(key),
+                    maxTemp: maxTemp.main.tempMax,
+                    minTemp: minTemp.main.tempMin,
+                    main: maxTemp.weather[0].main
+                )
             }
         }
     }
@@ -86,7 +88,6 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     override init() {
         super.init()
         locationManager.delegate = self
-        getWeatherForecast()
     }
     
     func requestLocation() {
@@ -96,25 +97,6 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         locationManager.requestLocation()
         locationManager.startUpdatingLocation()
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.first?.coordinate else { return }
-        isLoading = false
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        if let clError = error as? CLError {
-            switch clError.code {
-            case .locationUnknown:
-                print("Error, location unknown", error)
-            case .denied:
-                print("Error, Location denied", error)
-            default:
-                print("Error getting location", error)
-                isLoading = false
-            }
-        }
     }
     
     func formattedTime(from string: String,  timeZoneOffset: Double) -> String? {
@@ -163,37 +145,33 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
     
-    func getWeatherForecast() {
-        CLGeocoder().geocodeAddressString(currentLocation) { (placemarks, error) in
-            if let error = error as? CLError {
-                switch error.code {
-                case .locationUnknown, .geocodeFoundNoResult, .geocodeFoundPartialResult:
-                    print("Unable to determine location from this text.")
-                case .network:
-                    print("You do not appear to have a network connection")
-                default:
-                    print(error.localizedDescription)
-                }
-                self.isLoading = false
-                print(error.localizedDescription)
-            }
-            if let latitude = placemarks?.first?.location?.coordinate.latitude,
-               let longtitude = placemarks?.first?.location?.coordinate.longitude {
-                APIService.shared.getJSON(urlString: "https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=\(latitude)&lon=\(longtitude)&appid=14379450f55fe65f99b0236875893d09&units=metric", dateDecodingStrategy: .secondsSince1970) { (result: Result<ResponseData,APIService.APIError>) in
-                    switch result {
-                    case .success(let weather):
-                        DispatchQueue.main.async {
-                            self.isLoading = false
-                            self.weatherState = .init(from: weather)
-                        }
-                    case .failure(let apiError):
-                        switch apiError {
-                        case .error(let errorString):
-                            self.isLoading = false
-                            print(errorString)
-                        }
-                    }
-                }
+    func getWeatherForecast() async {
+        // TODO: implement API Request
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        await MainActor.run {
+            self.isLoading = false
+            self.weatherState = .init(from: previewData)
+        }
+    }
+}
+
+extension WeatherViewModel: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        currentLocation = locations.first?.coordinate
+        isLoading = false
+        Task { await getWeatherForecast() }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if let clError = error as? CLError {
+            switch clError.code {
+            case .locationUnknown:
+                print("Error, location unknown", error)
+            case .denied:
+                print("Error, Location denied", error)
+            default:
+                print("Error getting location", error)
+                isLoading = false
             }
         }
     }

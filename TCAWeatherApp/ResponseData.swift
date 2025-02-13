@@ -1,5 +1,5 @@
 //
-//  WeatherManager.swift
+//  ResponseData.swift
 //  TCAWeatherApp
 //
 //  Created by Musa Yazici on 2/13/25.
@@ -10,29 +10,28 @@ import CoreLocation
 import Combine
 import SwiftUI
 
-class WeatherManager {
-    func getCurrentWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) async throws -> ResponseData {
-        guard let url = URL(string: "https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=\(latitude)&lon=\(longitude)&appid=14379450f55fe65f99b0236875893d09&units=metric") else {
-            throw NSError(domain: "WeatherManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "Missing URL"])
-        }
+var previewData: ResponseData = load("ResponseData.json")
 
-        let urlRequest = URLRequest(url: url)
+func load<T: Decodable>(_ filename: String) -> T {
+    let data: Data
 
-        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+    guard let file = Bundle.main.url(forResource: filename, withExtension: nil)
+        else {
+            fatalError("Couldn't find \(filename) in main bundle.")
+    }
 
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-            print("Received HTTP Status Code: \(statusCode)")
-            throw NSError(domain: "WeatherManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "Error fetching weather data"])
-        }
+    do {
+        data = try Data(contentsOf: file)
+    } catch {
+        fatalError("Couldn't load \(filename) from main bundle:\n\(error)")
+    }
 
-        do {
-            let decodedData = try JSONDecoder().decode(ResponseData.self, from: data)
-            return decodedData
-        } catch let decodingError {
-            print("Decoding failed:", decodingError)
-            throw decodingError
-        }
+    do {
+        let decoder = JSONDecoder()
+        return try decoder.decode(T.self, from: data)
+    } catch {
+        print(error)
+        fatalError("Couldn't parse \(filename) as \(T.self):\n\(error)")
     }
 }
 
