@@ -46,14 +46,14 @@ class WeatherViewModel: NSObject, ObservableObject {
             let numberFormatter = NumberFormatter()
             numberFormatter.maximumFractionDigits = 0
             let numberFormatter2 = NumberFormatter()
-            numberFormatter.numberStyle = .percent
+            numberFormatter2.numberStyle = .percent
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "d/M E"
             
             self.name = weather.city.name
             self.day = dateFormatter.string(from: Date(timeIntervalSince1970: weather.list[0].dt))
             self.overview = weather.list[0].weather[0].description.capitalized
-            self.temperature = "\(numberFormatter.string(for: weather.list[0].main.temp.tempToCelsius()) ?? "0")°"
+            self.temperature = "\(numberFormatter.string(for: weather.list[0].main.temp.tempToCelsius()) ?? "0")°" // 285.45 -> 12
             self.high = "H: \(numberFormatter.string(for: weather.list[0].main.tempMax.tempToCelsius()) ?? "0")°"
             self.low = "L: \(numberFormatter.string(for: weather.list[0].main.tempMin.tempToCelsius()) ?? "0")°"
             self.feels = "\(numberFormatter.string(for: weather.list[0].main.feelsLike.tempToCelsius()) ?? "0")°"
