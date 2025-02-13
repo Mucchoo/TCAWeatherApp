@@ -24,6 +24,10 @@ struct ContentView: View {
                     .padding()
                     .aspectRatio(1.0, contentMode: .fill)
                 }
+            } else if viewModel.isLoading {
+                ProgressView()
+                     .progressViewStyle(CircularProgressViewStyle(tint: .primary))
+                     .font(.system(size: 100))
             } else {
                 VStack {
                     Text("Please share your current location to get the weather in your area")
@@ -33,7 +37,7 @@ struct ContentView: View {
                     .padding()
                     
                     LocationButton(.shareCurrentLocation) {
-                        viewModel.requestLocation()
+                        Task { await viewModel.getWeatherData() }
                     }
                     .cornerRadius(30)
                     .symbolVariant(.fill)

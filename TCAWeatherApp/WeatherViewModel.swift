@@ -6,14 +6,9 @@
 //
 
 import Foundation
-import CoreLocation
-import CoreLocationUI
-import Combine
 import SwiftUI
 
 class WeatherViewModel: NSObject, ObservableObject {
-    private let locationManager = CLLocationManager()
-    private var currentLocation: CLLocationCoordinate2D?
     @Published var isLoading = false
     @Published var weatherState: State?
     
@@ -85,18 +80,11 @@ class WeatherViewModel: NSObject, ObservableObject {
         }
     }
     
-    override init() {
-        super.init()
-        locationManager.delegate = self
-    }
-    
-    func requestLocation() {
+    @MainActor func getWeatherData() async {
         isLoading = true
-        locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-        locationManager.requestLocation()
-        locationManager.startUpdatingLocation()
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        isLoading = false
+        weatherState = .init(from: previewData)
     }
     
     func formattedTime(from string: String,  timeZoneOffset: Double) -> String? {
@@ -142,37 +130,6 @@ class WeatherViewModel: NSObject, ObservableObject {
             return Image(systemName: "cloud.snow.fill")
         default:
             return Image(systemName: "questionmark")
-        }
-    }
-    
-    func getWeatherForecast() async {
-        // TODO: implement API Request
-        try? await Task.sleep(nanoseconds: 300_000_000)
-        await MainActor.run {
-            self.isLoading = false
-            self.weatherState = .init(from: previewData)
-        }
-    }
-}
-
-extension WeatherViewModel: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations.first?.coordinate
-        isLoading = false
-        Task { await getWeatherForecast() }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        if let clError = error as? CLError {
-            switch clError.code {
-            case .locationUnknown:
-                print("Error, location unknown", error)
-            case .denied:
-                print("Error, Location denied", error)
-            default:
-                print("Error getting location", error)
-                isLoading = false
-            }
         }
     }
 }
